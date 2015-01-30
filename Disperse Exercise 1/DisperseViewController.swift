@@ -30,6 +30,11 @@ class DisperseViewController: UIViewController, UIAlertViewDelegate {
     private var boardView: UIView
     private var playButton: UIButton
     private var blueTurn: Bool
+    private var clubsView: UIImageView
+    private var diamondView: UIImageView
+    private var heartView: UIImageView
+    private var spadeView: UIImageView
+    
     
     var game: GameState
     var spades: Bool
@@ -86,6 +91,17 @@ class DisperseViewController: UIViewController, UIAlertViewDelegate {
         clubs = true
         boardView = UIView(frame: CGRectMake(0, BOARDTOPOFFSET, result.width, result.height-BOARDTOPOFFSET))
         playButton = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
+
+        //added
+        clubsView = UIImageView(image: UIImage(named: "club.png"))
+        diamondView = UIImageView(image: UIImage(named: "diamond.png"))
+        heartView = UIImageView(image: UIImage(named: "heart.png"))
+        spadeView = UIImageView(image: UIImage(named: "spade.png"))
+        
+        clubsView.frame = CGRectMake(0,  SUITIMAGETOPOFFSET, SUITIMAGESIZE, SUITIMAGESIZE)
+        diamondView.frame = CGRectMake(result.width - SUITIMAGESIZE, SUITIMAGETOPOFFSET, SUITIMAGESIZE, SUITIMAGESIZE)
+        heartView.frame = CGRectMake(0,  CONTROLTOPOFFSET-(SUITIMAGESIZE + CONTROLPAD), SUITIMAGESIZE, SUITIMAGESIZE)
+        spadeView.frame = CGRectMake(result.width - SUITIMAGESIZE, CONTROLTOPOFFSET-(SUITIMAGESIZE + CONTROLPAD), SUITIMAGESIZE, SUITIMAGESIZE)
         
         super.init(nibName: nil, bundle: nil)
         self.view = UIView(frame: UIScreen.mainScreen().bounds)
@@ -98,7 +114,12 @@ class DisperseViewController: UIViewController, UIAlertViewDelegate {
         playButton.setImage(UIImage(named: "play"), forState: UIControlState.Normal) //play.png
         playButton.addTarget(self, action: "playButtonPressed", forControlEvents: UIControlEvents.TouchUpInside)
         playButton.enabled = false
+        
         boardView.addSubview(playButton)
+        boardView.addSubview(clubsView)
+        boardView.addSubview(diamondView)
+        boardView.addSubview(heartView)
+        boardView.addSubview(spadeView)
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -202,18 +223,34 @@ class DisperseViewController: UIViewController, UIAlertViewDelegate {
         self.highlightOpenCards()
     }
     
+    //check
     private func setSuitIndicators() {
+        if !spades {
+            spadeView.removeFromSuperview()
+        }
+        if !diamonds {
+            diamondView.removeFromSuperview()
+        }
+        if !hearts {
+            heartView.removeFromSuperview()
+        }
+        if !clubs{
+            clubsView.removeFromSuperview()
+        }
+    }
+    
+    //new turn or game
+    //all boolean flags to true & all suits displayed
+    private func resetSuitIndicators() {
+        boardView.addSubview(clubsView)
+        boardView.addSubview(diamondView)
+        boardView.addSubview(heartView)
+        boardView.addSubview(spadeView)
         spades = true
         hearts = true
         diamonds = true
         clubs = true
-    }
-    
-    private func resetSuitIndicators() {
-        spades = false
-        hearts = false
-        diamonds = false
-        clubs = false
+        
     }
     
     func updateSuitIndicatorForCard(card: CardView) {
@@ -229,6 +266,9 @@ class DisperseViewController: UIViewController, UIAlertViewDelegate {
         else {
             clubs = false
         }
+        
+        //updates screen based on suit
+        setSuitIndicators()
     }
 
     func handlePan(recognizer: UIPanGestureRecognizer) {
